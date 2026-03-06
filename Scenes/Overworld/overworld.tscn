@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://d4mj7f1ah81lb"]
+
+[node name="Overworld" type="Node" unique_id=322082184]
+
+[node name="TerrainTileLayer" type="TileMapLayer" parent="." unique_id=28954785]
