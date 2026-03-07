@@ -1,5 +1,7 @@
 extends Node
 
+@onready var player = $Player
+
 @onready var terrainTileLayer = $TerrainTileLayer
 
 @export var startX : int
@@ -9,60 +11,39 @@ extends Node
 func _ready() -> void:
 	LoadTileData()
 
-func SaveTileData():
-	var tilemap_data = []
-	
-	for i in range(startX, startX+32):
-		for j in range(startY, startY+32):
-			var cell = Vector2i(i, j)
-			var srcId = terrainTileLayer.get_cell_source_id(cell)
-			var attlas_coords = terrainTileLayer.get_cell_atlas_coords(cell)
-			tilemap_data.append([cell, srcId, attlas_coords])
-	
-	var filePath = "res://" + file_name + ".dat"
-	
-	var file = FileAccess.open(filePath, FileAccess.WRITE)
-	file.store_string(JSON.stringify(tilemap_data))
-	file.close()
-	print("Napisano na " + filePath)
+func _process(_delta: float) -> void:
+	print("Global pos: " + str(player.global_position))
+	print("Chunk pos: " + str(floor(player.global_position/1024)))
+	print("Tile pos: " + str(floor(player.global_position/32)))
+	var tile_pos = floor(player.global_position/32)
+	var local_chunk_pos = Vector2i(posmod(tile_pos.x, 32), posmod(tile_pos.y, 32))
+	print("Local chunk pos: " + str(local_chunk_pos))
 
-func _on_button_pressed() -> void:
-	SaveTileData()
-
-const files = ["riverH_down1", "riverH_up1","riverV_down1","riverV_down2","riverV_up1","riverV_up2",]
 const riverPath = "res://Data/Chunks/River/"
 
-func LoadTileData():
-	var xPos = 0
-	
-	for fileName in files:
-		var filePath = riverPath + fileName + ".dat"
-		var file = FileAccess.open(filePath, FileAccess.READ)
-		var data = JSON.parse_string(file.get_as_text())
-		
-		var x = 0
-		var y = 0
-		for cell in data:
-			var pos = ParseVecFromStr(cell[0])
-			var src_id = cell[1]
-			var attlas_coord = ParseVecFromStr(cell[2])
-			
-			print(pos)
-			print(src_id)
-			print(attlas_coord)
-			
-			terrainTileLayer.set_cell(Vector2i(xPos + x, y), src_id, attlas_coord)
-			
-			y += 1
-			if (y > 31):
-				y = 0
-				x += 1
-		
-		xPos = xPos + 33
+const river = {
+	Vector2i(5, 0) : "riverH_down1",
+	Vector2i(4, 0) : "riverH_up1",
+	Vector2i(3, 0) : "riverV_down1",
+	Vector2i(3, 1) : "riverV_down2",
+	Vector2i(2, 1) : "riverH_up1",
+	Vector2i(1, 1) : "riverH_down1",
+	Vector2i(0, 1) : "riverV_up1",
+	Vector2i(0, 0) : "riverV_up2",
+	Vector2i(-1, 0) : "riverH_down1",
+	Vector2i(-2, 0) : "riverH_up1"
+}
 
-func ParseVecFromStr(input : String) -> Vector2i:
-	var cleaned = input.replace("(", "").replace(")", "")
-	var parts = cleaned.split(",")
-	var x = int(parts[0])
-	var y = int(parts[1])
-	return Vector2i(x, y)
+func LoadTileData():
+	for chunkPos in river:
+		var filePath = riverPath + river[chunkPos] + ".dat"
+		var chunkData = ChunkData.FromFile(filePath)
+		PlaceChunkAt(chunkPos, chunkData)
+
+func PlaceChunkAt(chunkPos : Vector2i, chunkData : ChunkData):
+	var globalTileXPos = chunkPos.x * 32
+	var globlTileYPos = chunkPos.y * 32
+	
+	for cell in chunkData.m_tiles:
+		var data = chunkData.m_tiles[cell]
+		terrainTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data[0], data[1])

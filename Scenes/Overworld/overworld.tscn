@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://d4mj7f1ah81lb"]
 
-[ext_resource type="Script" uid="uid://cdl4j1vxa81w" path="res://Scenes/Overworld/Scripts/SaveTileData.gd" id="1_6y65m"]
+[ext_resource type="Script" uid="uid://crswhpccjdacl" path="res://Scenes/Overworld/Scripts/overworld.gd" id="1_6y65m"]
 [ext_resource type="Texture2D" uid="uid://dbfw16v7efo78" path="res://Assets/Tilesets/Overworld2-Sheet.png" id="1_foo65"]
 [ext_resource type="Texture2D" uid="uid://b3ob0o87m0ipc" path="res://Assets/Tilesets/NatureTiles.png" id="2_7hkgx"]
 [ext_resource type="PackedScene" uid="uid://cdxp1ht7fbapr" path="res://Scenes/Entites/Player/player.tscn" id="3_7hkgx"]
@@ -41,9 +41,6 @@ sources/0 = SubResource("TileSetAtlasSource_n65ad")
 
 [node name="Overworld" type="Node" unique_id=322082184]
 script = ExtResource("1_6y65m")
-startX = 33
-startY = 33
-file_name = "riverV_up1"
 
 [node name="TerrainTileLayer" type="TileMapLayer" parent="." unique_id=28954785]
 texture_filter = 1
@@ -55,20 +52,3 @@ texture_filter = 1
 tile_set = SubResource("TileSet_c84f5")
 
 [node name="Player" parent="." unique_id=1117913195 instance=ExtResource("3_7hkgx")]
-position = Vector2(1672, 496)
-
-[node name="Button" type="Button" parent="." unique_id=655564686]
-visible = false
-anchors_preset = -1
-anchor_left = -0.28500003
-anchor_top = -0.185
-anchor_right = -0.28500003
-anchor_bottom = -0.185
-offset_left = -135.67996
-offset_top = -56.119995
-offset_right = 136.32004
-offset_bottom = 55.880005
-theme_override_font_sizes/font_size = 64
-text = "Sacuvaj lol"
-
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
