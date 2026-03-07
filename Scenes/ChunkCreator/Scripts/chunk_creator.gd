@@ -16,7 +16,7 @@ func _on_button_pressed() -> void:
 			var attlas_coords = terrainTileLayer.get_cell_atlas_coords(cell)
 			tilemap_data[Vector2i(i, j)] = [srcId, attlas_coords]
 	
-	var chunkData = ChunkData.new(ChunkData.ChunkType.River, tilemap_data)
+	var chunkData = ChunkData.new(ChunkData.ChunkType.RiverConnector, tilemap_data)
 	var filePath = "res://" + fileName + ".dat"
 	if (chunkData.ToFile(filePath)):
 		print("Napisano na " + filePath)

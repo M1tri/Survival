@@ -22,9 +22,9 @@ func _process(_delta: float) -> void:
 const riverPath = "res://Data/Chunks/River/"
 
 const river = {
-	Vector2i(5, 0) : "riverH_down1",
-	Vector2i(4, 0) : "riverH_up1",
-	Vector2i(3, 0) : "riverV_down1",
+	Vector2i(5, 0) : "",
+	Vector2i(4, 0) : "",
+	Vector2i(3, 0) : "",
 	Vector2i(3, 1) : "riverV_down2",
 	Vector2i(2, 1) : "riverH_up1",
 	Vector2i(1, 1) : "riverH_down1",

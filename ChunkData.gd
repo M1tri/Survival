@@ -1,7 +1,29 @@
 class_name ChunkData
 extends RefCounted
 
-enum ChunkType {Grass=0, River=1}
+enum ChunkType {
+	Grass = 0, 
+	
+	RiverHorizontalUp=1,
+	RiverHorizontalDown=2,
+	RiverVerticalUp1 = 3,
+	RiverVerticalUp2 = 4,
+	RiverVerticalDown1 = 5,
+	RiverVerticalDown2 = 6,
+	RiverConnector = 7,
+	RiverVertical = 8
+}
+
+const ChunkTypeToData  = {
+	ChunkType.RiverHorizontalUp : "riverH_up1",
+	ChunkType.RiverHorizontalDown : "riverH_down1",
+	ChunkType.RiverVerticalUp1 : "riverV_up1",
+	ChunkType.RiverVerticalUp2 : "riverV_up2",
+	ChunkType.RiverVerticalDown1 : "riverV_down1",
+	ChunkType.RiverVerticalDown2 : "riverV_down2",
+	ChunkType.RiverConnector : "riverConnector",
+	ChunkType.RiverVertical : "riverVertical"
+}
 
 var m_type : ChunkType
 var m_tiles : Dictionary
