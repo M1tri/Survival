@@ -22,7 +22,8 @@ enum ChunkBaseType {
 	RIVER_H_DOWN1,
 	RIVER_H_DOWN2,
 	RIVER_V1,
-	RIVER_CONNECTOR
+	RIVER_CONNECTOR,
+	SNOW
 }
 
 var m_baseType : ChunkBaseType
