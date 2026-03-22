@@ -4,8 +4,21 @@ extends RefCounted
 const CHUNK_SIZE : int = 32
 
 class TerrainTileData:
+	var m_type : Global.TileType
 	var m_srcId : int
 	var m_attlassCoords : Vector2i
+	
+	static func MakeNew(type : Global.TileType) -> TerrainTileData:
+		var ret = TerrainTileData.new()
+		
+		ret.m_type = type
+		ret.m_srcId = Global.TileTypeData[type][Global.TileSrcID]
+		ret.m_attlassCoords = Global.TileTypeData[type][Global.TileAttlassCoords]
+		
+		return ret
+	
+	func IsEqual(type : Global.TileType):
+		return self.m_type == type
 
 class DecorationTileData:
 	pass

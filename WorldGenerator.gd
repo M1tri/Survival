@@ -87,25 +87,13 @@ func GenerateVerticalRiver(connectorPos : Vector2i):
 		yPos -= 1
 
 func GenerateSnowPath():
-	var snowH : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snowH.m_srcId = 3
-	snowH.m_attlassCoords = Vector2i(14, 0)
+	var snowH : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_MIDDLE)
 	
-	var snowDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snowDown1.m_srcId = 3
-	snowDown1.m_attlassCoords = Vector2i(13, 0)
+	var snowDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_DOWN1)
+	var snowDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_DOWN2)
 	
-	var snowDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snowDown2.m_srcId = 3
-	snowDown2.m_attlassCoords = Vector2i(13, 1)
-	
-	var snowUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snowUp1.m_srcId = 3
-	snowUp1.m_attlassCoords = Vector2i(15, 1)
-	
-	var snowUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snowUp2.m_srcId = 3
-	snowUp2.m_attlassCoords = Vector2i(15, 0)
+	var snowUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_UP1)
+	var snowUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_UP2)
 	
 	var chunksPathIsIn : Array[Vector2i] = []
 	@warning_ignore("integer_division")
@@ -148,53 +136,22 @@ func GenerateSnowPath():
 	m_structures.append(SnowLine.new(pathData, chunksPathIsIn))
 
 func GenerateCliff():
-	var cliffHstart : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHstart.m_srcId = 3
-	cliffHstart.m_attlassCoords = Vector2i(1, 0)
-
-	var cliffHstartDown : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHstartDown.m_srcId = 3
-	cliffHstartDown.m_attlassCoords = Vector2i(1, 1)
+	var cliffHstart : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_START_TOP)
+	var cliffHstartDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_START_BOTTOM)
 	
-	var cliffHend : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHend.m_srcId = 3
-	cliffHend.m_attlassCoords = Vector2i(3, 0)
-
-	var cliffHendDown : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHendDown.m_srcId = 3
-	cliffHendDown.m_attlassCoords = Vector2i(3, 1)
+	var cliffHend : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_END_TOP)
+	var cliffHendDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_END_BOTTOM)
 	
-	var cliffHmiddle : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHmiddle.m_srcId = 3
-	cliffHmiddle.m_attlassCoords = Vector2i(2, 0)
-
-	var cliffHmiddleDown : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffHmiddleDown.m_srcId = 3
-	cliffHmiddleDown.m_attlassCoords = Vector2i(2, 1)
+	var cliffHmiddle : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_MIDDLE_TOP)
+	var cliffHmiddleDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_MIDDLE_BOTTOM)
 	
-	var cliffDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffDown1.m_srcId = 3
-	cliffDown1.m_attlassCoords = Vector2i(1, 2)
+	var cliffDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_1)
+	var cliffDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_2)
+	var cliffDown3 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_3)
 	
-	var cliffDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffDown2.m_srcId = 3
-	cliffDown2.m_attlassCoords = Vector2i(1, 3)
-	
-	var cliffDown3 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffDown3.m_srcId = 3
-	cliffDown3.m_attlassCoords = Vector2i(1, 4)
-	
-	var cliffUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffUp1.m_srcId = 3
-	cliffUp1.m_attlassCoords = Vector2i(3, 2)
-	
-	var cliffUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffUp2.m_srcId = 3
-	cliffUp2.m_attlassCoords = Vector2i(3, 3)
-	
-	var cliffUp3 : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	cliffUp3.m_srcId = 3
-	cliffUp3.m_attlassCoords = Vector2i(3, 4)
+	var cliffUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_1)
+	var cliffUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_2)
+	var cliffUp3 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_3)
 	
 	var tileData : Dictionary[Vector2i, Chunk.TerrainTileData] = {}
 	@warning_ignore("integer_division")
@@ -206,6 +163,8 @@ func GenerateCliff():
 		chunksPathIsIn.append(Vector2i(i, m_cliff1Height+1))
 	
 	var posToSkip : int = 0
+	var skipCooldown : int = 0
+	var heightChangeCooldown : int = 0
 	@warning_ignore("integer_division")
 	for tileXPos in range(-m_worldSize/2 * 32, m_worldSize/2 * 32):
 		if posToSkip > 0:
@@ -213,16 +172,17 @@ func GenerateCliff():
 			if posToSkip == 0:
 				tileData[Vector2i(tileXPos, tileYPos)] = cliffHstart
 				tileData[Vector2i(tileXPos, tileYPos-1)] = cliffHstartDown
+				skipCooldown = 10
 			continue
 		
-		if randi_range(1, 20) == 5:
+		if randi_range(1, 50) == 5 and skipCooldown == 0:
 			tileData[Vector2i(tileXPos, tileYPos)] = cliffHend
 			tileData[Vector2i(tileXPos, tileYPos-1)] = cliffHendDown
 			
 			posToSkip = randi_range(3, 10)
 			continue
 		
-		if (randi_range(1, 10) == 5):
+		if (randi_range(1, 10) == 5) and heightChangeCooldown == 0:
 			var direction : int = [-1, 1].pick_random()
 			
 			if direction == 1:
@@ -235,11 +195,18 @@ func GenerateCliff():
 				tileData[Vector2i(tileXPos, tileYPos)] = cliffDown2
 				tileData[Vector2i(tileXPos, tileYPos-1)] = cliffDown3
 				tileYPos += 1
-			
+				
+			heightChangeCooldown = 2
 			continue
 		
 		tileData[Vector2i(tileXPos, tileYPos)] = cliffHmiddle
 		tileData[Vector2i(tileXPos, tileYPos-1)] = cliffHmiddleDown
+		if skipCooldown > 0:
+			skipCooldown -= 1
+		
+		if heightChangeCooldown > 0:
+			heightChangeCooldown -= 1
+
 	
 	m_structures.append(Cliff.new(tileData, chunksPathIsIn))
 

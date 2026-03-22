@@ -1,22 +1,45 @@
 [gd_scene format=3 uid="uid://cdxp1ht7fbapr"]
 
 [ext_resource type="Script" uid="uid://bl6sheo7fpniv" path="res://Scenes/Entites/Player/Script/player.gd" id="1_ipn0c"]
-[ext_resource type="Texture2D" uid="uid://w6r1skw3nltc" path="res://icon.svg" id="1_kk1cv"]
+[ext_resource type="Texture2D" uid="uid://4vpgp874ao30" path="res://Assets/Player/radosh-3.1-Sheet.png" id="3_b12lf"]
 [ext_resource type="Script" uid="uid://cyhc107q41clo" path="res://Scenes/Entites/Player/Script/PlayerCamera.gd" id="3_req4h"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ipn0c"]
 radius = 40.0
 height = 80.0
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_req4h"]
+atlas = ExtResource("3_b12lf")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b12lf"]
+atlas = ExtResource("3_b12lf")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_265jr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_req4h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b12lf")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="Player" type="CharacterBody2D" unique_id=1117913195]
 script = ExtResource("1_ipn0c")
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1966470087]
-position = Vector2(3.33786e-06, 2.861023e-06)
-texture = ExtResource("1_kk1cv")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1638084906]
 shape = SubResource("CapsuleShape2D_ipn0c")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=841346008]
 script = ExtResource("3_req4h")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1888008275]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_265jr")
+frame_progress = 0.7326886
