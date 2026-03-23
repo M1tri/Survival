@@ -45,6 +45,25 @@ enum TileType {
 	
 	SNOW_PATH_UP1,
 	SNOW_PATH_UP2,
+	
+	# WATER
+	WATER,
+	
+	WATER_GRASS_START_TOP,
+	WATER_GRASS_MIDDLE_TOP,
+	WATER_GRASS_END_TOP,
+	
+	WATER_GRASS_LEFT,
+	WATER_GRASS_RIGHT,
+	
+	WATER_GRASS_START_BOTTOM,
+	WATER_GRASS_MIDDLE_BOTTOM,
+	WATER_GRASS_END_BOTTOM,
+	
+	WATER_GRASS_ISLAND_TOP_LEFT,
+	WATER_GRASS_ISLAND_TOP_RIGHT,
+	WATER_GRASS_ISLAND_BOTTOM_LEFT,
+	WATER_GRASS_ISLAND_BOTTOM_RIGHT
 }
 
 const TileSrcID : String = "srcId"
@@ -91,4 +110,22 @@ const TileTypeData : Dictionary = {
 	TileType.SNOW_PATH_DOWN2 : {TileSrcID : 3, TileAttlassCoords : Vector2i(13, 1) },
 	TileType.SNOW_PATH_UP1 : {TileSrcID : 3, TileAttlassCoords : Vector2i(15, 1) },
 	TileType.SNOW_PATH_UP2 : {TileSrcID : 3, TileAttlassCoords : Vector2i(15, 0) },
+	
+	TileType.WATER : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 1) },
+	
+	TileType.WATER_GRASS_START_TOP : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 0) },
+	TileType.WATER_GRASS_MIDDLE_TOP : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 0) },
+	TileType.WATER_GRASS_END_TOP : {TileSrcID : 3, TileAttlassCoords : Vector2i(6, 0) },
+	
+	TileType.WATER_GRASS_LEFT : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 1) },
+	TileType.WATER_GRASS_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(6, 1) },
+	
+	TileType.WATER_GRASS_START_BOTTOM : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 2) },
+	TileType.WATER_GRASS_MIDDLE_BOTTOM : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 2) },
+	TileType.WATER_GRASS_END_BOTTOM : {TileSrcID : 3, TileAttlassCoords : Vector2i(6, 2) },
+	
+	TileType.WATER_GRASS_ISLAND_TOP_LEFT : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 3) },
+	TileType.WATER_GRASS_ISLAND_TOP_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 3) },
+	TileType.WATER_GRASS_ISLAND_BOTTOM_LEFT : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 4) },
+	TileType.WATER_GRASS_ISLAND_BOTTOM_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 4) }
 }

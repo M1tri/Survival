@@ -54,6 +54,10 @@ func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 			structure.PlaceInChunk(chunkPos, m_terrainTiles)
 	
 	var chunk = Chunk.new(chunkBaseType, m_terrainTiles, null, null)
+	
+	var fileName : String = str(chunkPos)
+	chunk.SaveToFile("res://" + fileName + ".tres")
+	
 	return chunk
 
 func PlaceChunkAt(chunkPos : Vector2i, chunkData : Chunk):
@@ -86,14 +90,8 @@ func LoadBaseChunkTypeTerrain(baseType : Chunk.ChunkBaseType) -> Dictionary[Vect
 	for pos in json:
 		var value = JSON.parse_string(pos)
 		var tilePos : Vector2i = Vector2i(int(value[0]), int(value[1]))
+		var tile : Global.TileType = int(json[pos]) as Global.TileType
 		
-		var dataRaw = json[pos]
-		var srcId = dataRaw[0]
-		var attlas_coords = Vector2i(int(dataRaw[1]), int(dataRaw[2]))
-		var tileData = Chunk.TerrainTileData.new()
-		tileData.m_srcId = srcId
-		tileData.m_attlassCoords = attlas_coords
-		
-		terrain[tilePos] = tileData
+		terrain[tilePos] = Chunk.TerrainTileData.MakeNew(tile)
 	
 	return terrain

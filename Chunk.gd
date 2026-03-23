@@ -50,8 +50,23 @@ func _init(baseType, terrainTiles, decorationTiles, entityTiles) -> void:
 	#m_decorationTiles = decorationTiles
 	#m_entityTiles = entityTiles
 
-static func FromFile(filePath : String) -> Chunk:
-	return null
+static func FromFile(resourcePath : String) -> Chunk:
+	var resource : ChunkSaveResource = load(resourcePath) as ChunkSaveResource 
+	
+	var tiles : Dictionary[Vector2i, TerrainTileData] = {}
+	for tileType in resource.tileData:
+		tiles[tileType] = TerrainTileData.MakeNew(resource.tileData[tileType])
+	
+	return Chunk.new(resource.baseType, tiles, {}, {})
+
+func SaveToFile(resourcePath : String):
+	var resource : ChunkSaveResource = ChunkSaveResource.new()
+	
+	for tile in m_terrainTiles:
+		resource.tileData[tile] = m_terrainTiles[tile].m_type
+	resource.baseType = m_baseType
+	
+	ResourceSaver.save(resource, resourcePath)
 
 func GetTileAt(pos : Vector2i) -> TerrainTileData:
 	return m_terrainTiles[pos]
