@@ -1,9 +1,9 @@
 @abstract
 class_name Structure
-extends RefCounted
+extends Resource
 
-var m_tileData : Dictionary[Vector2i, Chunk.TerrainTileData]
-var m_chunks : Array[Vector2i]
+@export var m_tileData : Dictionary[Vector2i, Global.TileType]
+@export var m_chunks : Array[Vector2i]
 
 @abstract
 func IsInChunk(chunkPos : Vector2i) -> bool

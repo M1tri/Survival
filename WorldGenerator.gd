@@ -9,7 +9,7 @@ var m_snowStartY : int
 
 var m_cliff1Height : int
 
-var m_structures : Array[Structure]
+var m_structures : Array[Structure] = []
 
 func _init(worldSize : int) -> void:
 	m_worldSize = worldSize
@@ -34,9 +34,21 @@ func GenerateChunkBaseTypes():
 	GenerateRivers()
 	GenerateSnowPath()
 	
+	GenerateStoneBiome()
+	
 	@warning_ignore("integer_division")
 	m_cliff1Height = m_snowStartY/2
 	GenerateCliff()
+	
+	var worldData : WorldData = WorldData.new()
+	var name : String = "svet"
+	worldData.worldName = name
+	worldData.chunkTypeMap = m_chunkBaseMap 
+	worldData.structures = m_structures
+	
+	ResourceSaver.save(worldData, "res://" + name + ".tres")
+	
+	var worldData2 = load("res://" + name + ".tres")
 
 func GenerateRivers():
 	@warning_ignore("integer_division")
@@ -87,20 +99,20 @@ func GenerateVerticalRiver(connectorPos : Vector2i):
 		yPos -= 1
 
 func GenerateSnowPath():
-	var snowH : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_MIDDLE)
+	var snowH = Global.TileType.SNOW_PATH_MIDDLE
 	
-	var snowDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_DOWN1)
-	var snowDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_DOWN2)
+	var snowDown1  = Global.TileType.SNOW_PATH_DOWN1
+	var snowDown2  = Global.TileType.SNOW_PATH_DOWN2
 	
-	var snowUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_UP1)
-	var snowUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.SNOW_PATH_UP2)
+	var snowUp1  = Global.TileType.SNOW_PATH_UP1
+	var snowUp2  = Global.TileType.SNOW_PATH_UP2
 	
 	var chunksPathIsIn : Array[Vector2i] = []
 	@warning_ignore("integer_division")
 	for i in range(-m_worldSize/2, m_worldSize/2):
 		chunksPathIsIn.append(Vector2i(i, m_snowStartY+1))
 	
-	var pathData : Dictionary[Vector2i, Chunk.TerrainTileData] = {}
+	var pathData : Dictionary[Vector2i, Global.TileType] = {}
 	
 	@warning_ignore("integer_division")
 	var tileYPos = (m_snowStartY + 1) * 32 - 32/2
@@ -133,27 +145,30 @@ func GenerateSnowPath():
 		else:
 			pathData[Vector2i(tileXPos, tileYPos)] = snowH
 	
-	m_structures.append(SnowLine.new(pathData, chunksPathIsIn))
+	var snowLine : SnowLine = SnowLine.new()
+	snowLine.m_chunks = chunksPathIsIn
+	snowLine.m_tileData = pathData
+	m_structures.append(snowLine)
 
 func GenerateCliff():
-	var cliffHstart : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_START_TOP)
-	var cliffHstartDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_START_BOTTOM)
+	var cliffHstart  = Global.TileType.GRASS_CLIFF_START_TOP
+	var cliffHstartDown  = Global.TileType.GRASS_CLIFF_START_BOTTOM
 	
-	var cliffHend : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_END_TOP)
-	var cliffHendDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_END_BOTTOM)
+	var cliffHend  = Global.TileType.GRASS_CLIFF_END_TOP
+	var cliffHendDown  = Global.TileType.GRASS_CLIFF_END_BOTTOM
 	
-	var cliffHmiddle : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_MIDDLE_TOP)
-	var cliffHmiddleDown : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_MIDDLE_BOTTOM)
+	var cliffHmiddle  = Global.TileType.GRASS_CLIFF_MIDDLE_TOP
+	var cliffHmiddleDown  = Global.TileType.GRASS_CLIFF_MIDDLE_BOTTOM
 	
-	var cliffDown1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_1)
-	var cliffDown2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_2)
-	var cliffDown3 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_DOWN_3)
+	var cliffDown1  = Global.TileType.GRASS_CLIFF_DOWN_1
+	var cliffDown2  = Global.TileType.GRASS_CLIFF_DOWN_2
+	var cliffDown3  = Global.TileType.GRASS_CLIFF_DOWN_3
 	
-	var cliffUp1 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_1)
-	var cliffUp2 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_2)
-	var cliffUp3 : Chunk.TerrainTileData = Chunk.TerrainTileData.MakeNew(Global.TileType.GRASS_CLIFF_UP_3)
+	var cliffUp1  = Global.TileType.GRASS_CLIFF_UP_1
+	var cliffUp2  = Global.TileType.GRASS_CLIFF_UP_2
+	var cliffUp3  = Global.TileType.GRASS_CLIFF_UP_3
 	
-	var tileData : Dictionary[Vector2i, Chunk.TerrainTileData] = {}
+	var tileData : Dictionary[Vector2i, Global.TileType] = {}
 	@warning_ignore("integer_division")
 	var tileYPos = (m_cliff1Height + 1) * 32 - 32/2
 	
@@ -206,9 +221,61 @@ func GenerateCliff():
 		
 		if heightChangeCooldown > 0:
 			heightChangeCooldown -= 1
-
 	
-	m_structures.append(Cliff.new(tileData, chunksPathIsIn))
+	var cliff : Cliff = Cliff.new()
+	cliff.m_chunks = chunksPathIsIn
+	cliff.m_tileData = tileData
+	m_structures.append(cliff)
+
+func GenerateStoneBiome():
+	
+	# at least 3 chunks away from center and world border, either left or right of origin
+	@warning_ignore("integer_division")
+	var stoneBiomePosX : int = [-1, 1].pick_random() * randi_range(3, m_worldSize/2-3)
+	var stoneBiomePosY : int
+	
+	while true:
+		@warning_ignore("integer_division")
+		stoneBiomePosY = randi_range(5, m_worldSize/2 - 1)
+		# 5x5 of chunks around potential position must be grass
+		for x in range(-2, 3):
+			for y in range(-2, 3):
+				var potentialPos : Vector2i = Vector2i(stoneBiomePosX+x, stoneBiomePosY+y)
+				if not (potentialPos in m_chunkBaseMap):
+					continue
+				if m_chunkBaseMap[potentialPos] != Chunk.ChunkBaseType.GRASS:
+					continue
+		print("Rock biome pos is: ", stoneBiomePosX, ", ", stoneBiomePosY)
+		break
+	
+	var stoneBiomePos : Vector2i = Vector2i(stoneBiomePosX, stoneBiomePosY)
+	
+	var stack : Array = []
+	var visited : Array = []
+	
+	var initLifeTime : int = 5
+	stack.append([stoneBiomePos, initLifeTime])
+	
+	while not stack.is_empty():
+		var value : Array = stack.pop_back()
+		var position : Vector2i = value[0]
+		var currLifeTime : int = value[1]
+		
+		if currLifeTime <= 0:
+			continue
+		
+		if position in m_chunkBaseMap and m_chunkBaseMap[position] == Chunk.ChunkBaseType.GRASS:
+			m_chunkBaseMap[position] = Chunk.ChunkBaseType.STONY
+		else:
+			continue
+		
+		for i in [-1, 0, 1]:
+			for j in [-1, 0, 1]:
+				var neighbour : Vector2i = Vector2i(position.x + i, position.y + j)
+				if (neighbour in m_chunkBaseMap) and (not neighbour in visited):
+					stack.append([neighbour, currLifeTime - randi_range(1, 3)])
+		
+		visited.append(position)
 
 func GetChunkBaseMap() -> Dictionary[Vector2i, Chunk.ChunkBaseType]:
 	return m_chunkBaseMap

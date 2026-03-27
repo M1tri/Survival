@@ -1,10 +1,6 @@
 class_name Cliff
 extends Structure
 
-func _init(tileData : Dictionary[Vector2i, Chunk.TerrainTileData], chunks : Array[Vector2i]) -> void:
-	m_tileData = tileData
-	m_chunks = chunks
-
 func IsInChunk(chunkPos : Vector2i) -> bool:
 	for chunk in m_chunks:
 		if chunk == chunkPos:
@@ -20,4 +16,4 @@ func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Chunk.Te
 		var tileGlobal : Vector2i = CoordinateConverter.ChunkLocalToTileGlobal(chunkLocal, chunkPos)
 		
 		if m_tileData.has(tileGlobal):
-			chunkData[chunkLocal] = m_tileData[tileGlobal]
+			chunkData[chunkLocal] = Chunk.TerrainTileData.MakeNew(m_tileData[tileGlobal])

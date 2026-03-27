@@ -2,17 +2,45 @@ extends Node
 
 @onready var player = $Player
 @onready var terrainTileLayer = $TerrainTileLayer
-@onready var worldManager : WorldManager = $WorldManager
+@onready var decorationTileLayer = $DecorationTileLayer
+
+const RENDER_DISTANCE : int = 3
+
+var chunkGenerator : ChunkGenerator
 
 const save : bool = false
 
-var playerChunkPos : Vector2i
+var playerChunkPos : Vector2i = Vector2i(-1, -1)
+
+const fileName : String = "warudo"
+const worldSize : int = 64
+
+var m_loadedChunk : Dictionary[Vector2i, Chunk] = {}
 
 func _ready() -> void:
-	worldManager.PrepareWorld(64)
-	if save:
-		for pos in chunksToSave:
-			SaveChunks(pos, chunksToSave[pos])
+	if not FileAccess.file_exists("res://" + fileName + ".tres"):
+		GenerateWorld(worldSize)
+	
+	chunkGenerator = preload("res://Scenes/Chunk/ChunkGenerator/ChunkGenerator.tscn").instantiate()
+	chunkGenerator.worldName = fileName
+	chunkGenerator.ChunkGenerated.connect(ChunkGeneratedHandler)
+	add_child(chunkGenerator)
+
+func GenerateWorld(worldSize : int):
+	var worldGenerator = WorldGenerator.new(worldSize)
+	worldGenerator.GenerateChunkBaseTypes()
+	
+	var worldData : WorldData = WorldData.new()
+	worldData.worldName = fileName
+	worldData.worldSize = worldSize
+	worldData.chunkTypeMap = worldGenerator.GetChunkBaseMap()
+	worldData.structures = worldGenerator.GetStructures()
+	
+	ResourceSaver.save(worldData, "res://" + fileName + ".tres")
+
+func ChunkGeneratedHandler(chunkPos : Vector2i, chunk : Chunk):
+	PlaceChunk(chunkPos, chunk)
+	m_loadedChunk[chunkPos] = chunk
 
 func _process(_delta: float) -> void:
 	var newPlayerChunkPos = Vector2i(player.global_position.x / 32, player.global_position.y / 32)
@@ -21,54 +49,56 @@ func _process(_delta: float) -> void:
 	if (newPlayerChunkPos != playerChunkPos):
 		playerChunkPos = newPlayerChunkPos
 		print(playerChunkPos)
+		UpdateLoadedChunks()
+	
+func UpdateLoadedChunks():
+	
+	var chunksToKeepOrLoad : Array[Vector2i] = []
+	
+	for i in range(-RENDER_DISTANCE, RENDER_DISTANCE+1):
+		for j in range(-RENDER_DISTANCE, RENDER_DISTANCE+1):
+			var chunk_pos = Vector2i(playerChunkPos.x+i, playerChunkPos.y+j)
+			@warning_ignore("integer_division")
+			if chunk_pos.x < -worldSize/2 or chunk_pos.x >= worldSize/2:
+				continue
+			@warning_ignore("integer_division")
+			if chunk_pos.y < -worldSize/2 or chunk_pos.y >= worldSize/2:
+				continue
+			
+			chunksToKeepOrLoad.append(chunk_pos)
+	
+	var chunksToUnload : Array[Vector2i] = []
+	var chunksToload : Array[Vector2i] = chunksToKeepOrLoad.duplicate(true)
+	
+	for chunkPos in m_loadedChunk:
+		if not (chunkPos in chunksToKeepOrLoad):
+			chunksToUnload.append(chunkPos)
+		else:
+			chunksToload.erase(chunkPos)
+	
+	for chunkPos in chunksToUnload:
+		UnloadChunk(chunkPos)
+		m_loadedChunk.erase(chunkPos)
+	
+	chunkGenerator.GenerateChunks(chunksToload)
 
-var chunksToSave = {
-	Vector2i(0, 0) : "riverH1",
-	Vector2i(1, 0) : "riverH2",
-	
-	Vector2i(2, 0) : "riverH_up2",
-	Vector2i(2, 1) : "riverH_up1",
-	
-	Vector2i(-1, 0) : "riverH_down1",
-	Vector2i(-1, 1) : "riverH_down2",
-	
-	Vector2i(-3, 1) : "riverConnector",
-	
-	Vector2i(-3, 0) : "riverV1",
-	Vector2i(-3, -1) : "riverV2"
-}
+func PlaceChunk(chunkPos : Vector2i, chunk : Chunk):
+	var globalTileXPos = chunkPos.x * 32
+	var globlTileYPos = chunkPos.y * 32
+	for cell in chunk.m_terrainTiles:
+		var data : Chunk.TerrainTileData = chunk.m_terrainTiles[cell]
+		terrainTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
+		
+	for cell in chunk.m_decorationTiles:
+		var data : Chunk.DecorationTileData = chunk.m_decorationTiles[cell]
+		decorationTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
 
-func SaveChunks(chunkPos, fileName):
-	var path = "res://"
-	var file = FileAccess.open(path + fileName + ".dat", FileAccess.WRITE)
-	
-	var startX = chunkPos.x * 32
-	var startY = chunkPos.y * 32
-	
-	var map = {
-		Vector2i(0, 0) : Global.TileType.GRASS,
-		Vector2i(5, 1) : Global.TileType.WATER,
-		Vector2i(4, 0) : Global.TileType.WATER_GRASS_START_TOP,
-		Vector2i(5, 0) : Global.TileType.WATER_GRASS_MIDDLE_TOP,
-		Vector2i(6, 0) : Global.TileType.WATER_GRASS_END_TOP,
-		Vector2i(4, 1): Global.TileType.WATER_GRASS_LEFT,
-		Vector2i(6, 1): Global.TileType.WATER_GRASS_RIGHT ,
-		Vector2i(4, 2) : Global.TileType.WATER_GRASS_START_BOTTOM,
-		Vector2i(5, 2) : Global.TileType.WATER_GRASS_MIDDLE_BOTTOM ,
-		Vector2i(6, 2) : Global.TileType.WATER_GRASS_END_BOTTOM,
-		Vector2i(4, 3) : Global.TileType.WATER_GRASS_ISLAND_TOP_LEFT ,
-		Vector2i(5, 3) : Global.TileType.WATER_GRASS_ISLAND_TOP_RIGHT ,
-		Vector2i(4, 4) : Global.TileType.WATER_GRASS_ISLAND_BOTTOM_LEFT,
-		Vector2i(5, 4) : Global.TileType.WATER_GRASS_ISLAND_BOTTOM_RIGHT 
-	}
-	
-	var tiles : Dictionary[Array, Global.TileType] = {}
+
+func UnloadChunk(chunkPos : Vector2i):
+	var globalTileXPos = chunkPos.x * 32
+	var globalTileYPos = chunkPos.y * 32
 	for i in range(32):
 		for j in range(32):
-			#var srcId = terrainTileLayer.get_cell_source_id(Vector2i(startX + i, startY + j))
-			var attlasCoords : Vector2i = terrainTileLayer.get_cell_atlas_coords(Vector2i(startX+i, startY+j))
-			tiles[[i, j]] = map[attlasCoords]
-	
-	var txt = JSON.stringify(tiles, "\t")
-	file.store_string(txt)
-	file.close()
+			var tilePos : Vector2i = Vector2i(globalTileXPos + i, globalTileYPos + j)
+			terrainTileLayer.erase_cell(tilePos)
+			decorationTileLayer.erase_cell(tilePos)

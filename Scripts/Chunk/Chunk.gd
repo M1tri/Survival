@@ -21,7 +21,21 @@ class TerrainTileData:
 		return self.m_type == type
 
 class DecorationTileData:
-	pass
+	var m_type : Global.DecorationTileTypes
+	var m_srcId : int
+	var m_attlassCoords : Vector2i
+	
+	static func MakeNew(type : Global.DecorationTileTypes) -> DecorationTileData:
+		var ret = DecorationTileData.new()
+		
+		ret.m_type = type
+		ret.m_srcId = Global.DecorationTileTypeData[type][Global.TileSrcID]
+		ret.m_attlassCoords = Global.DecorationTileTypeData[type][Global.TileAttlassCoords]
+		
+		return ret
+	
+	func IsEqual(type : Global.TileType):
+		return self.m_type == type
 
 class EntityTileData:
 	pass
@@ -36,7 +50,8 @@ enum ChunkBaseType {
 	RIVER_H_DOWN2,
 	RIVER_V1,
 	RIVER_CONNECTOR,
-	SNOW
+	SNOW,
+	STONY
 }
 
 var m_baseType : ChunkBaseType
@@ -47,7 +62,7 @@ var m_entityTiles : Dictionary[Vector2i, EntityTileData]
 func _init(baseType, terrainTiles, decorationTiles, entityTiles) -> void:
 	m_baseType = baseType
 	m_terrainTiles = terrainTiles
-	#m_decorationTiles = decorationTiles
+	m_decorationTiles = decorationTiles
 	#m_entityTiles = entityTiles
 
 static func FromFile(resourcePath : String) -> Chunk:

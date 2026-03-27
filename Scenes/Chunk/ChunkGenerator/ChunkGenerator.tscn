@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://lvlk5av4ilcv"]
+
+[ext_resource type="Script" uid="uid://bkvdhpfm5yp6p" path="res://Scripts/Utils/ChunkGenerator.gd" id="1_4rooh"]
+
+[node name="ChunkGenerator" type="Node" unique_id=262596399]
+script = ExtResource("1_4rooh")

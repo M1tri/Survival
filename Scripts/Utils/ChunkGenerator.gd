@@ -1,50 +1,23 @@
-class_name WorldManager
+class_name ChunkGenerator
 extends Node
 
-const RENDER_DISTANCE = 1
+signal ChunkGenerated(chunkPos : Vector2i, chunk : Chunk)
 
-@export var player : CharacterBody2D
-@export var terrainTilesLayer : TileMapLayer
-@export var decoratinTilesLayer : TileMapLayer
+@onready var worldName : String
 
-var m_loadedChunks : Dictionary[Vector2i, Chunk]
-var m_noiseMap : Array[Array] = []
-var m_worldSize : int
-var m_chunkBaseMap : Dictionary[Vector2i, Chunk.ChunkBaseType]
-var m_structures : Array[Structure]
+var m_worldData : WorldData = null
+func _ready() -> void:
+	m_worldData = load("res://" + worldName + ".tres") as WorldData
+	assert(m_worldData != null)
 
-func PrepareWorld(worldSize : int, worldName : String):
-	var fnl := FastNoiseLite.new()
-	
-	for x in range(worldSize):
-		var row : Array[float] = []
-		for y in range(worldSize):
-			row.append(fnl.get_noise_2d(x, y))
-		m_noiseMap.append(row)
-	
-	m_worldSize = worldSize
-	var worldGenerator = WorldGenerator.new(m_worldSize)
-	worldGenerator.GenerateChunkBaseTypes()
-	m_chunkBaseMap = worldGenerator.GetChunkBaseMap()
-	m_structures = worldGenerator.GetStructures()
-	
-	
-	
-	m_loadedChunks = {}
-
-func _process(_delta: float) -> void:
-	var playerChunkPos = floor(player.global_position / 1024)
-	
-	for i in range(-RENDER_DISTANCE, RENDER_DISTANCE+1):
-		for j in range(-RENDER_DISTANCE, RENDER_DISTANCE+1):
-			var chunk_pos = Vector2i(playerChunkPos.x+i, playerChunkPos.y+j)
-			if (chunk_pos not in m_loadedChunks and chunk_pos in m_chunkBaseMap):
-				var chunk : Chunk = GenerateChunk(chunk_pos)
-				m_loadedChunks[chunk_pos] = chunk
-				PlaceChunkAt(chunk_pos, chunk)
+# TODO this will be async multithreaded someday (soon i hope lol)
+func GenerateChunks(positions : Array[Vector2i]):
+	for pos in positions:
+		var chunk : Chunk = GenerateChunk(pos)
+		ChunkGenerated.emit(pos, chunk)
 
 func GenerateChunk(chunkPos : Vector2i) -> Chunk:
-	var chunkBaseType : Chunk.ChunkBaseType = m_chunkBaseMap[chunkPos]
+	var chunkBaseType : Chunk.ChunkBaseType = m_worldData.chunkTypeMap[chunkPos]
 	
 	var m_terrainTiles : Dictionary[Vector2i, Chunk.TerrainTileData]
 	var decorationTiles : Dictionary[Vector2i, Chunk.DecorationTileData]
@@ -62,13 +35,10 @@ func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 	else:
 		m_terrainTiles = LoadBaseChunkTypeTerrain(chunkBaseType)
 	
-	for structure in m_structures:
+	for structure in m_worldData.structures:
 		if structure.IsInChunk(chunkPos):
 			structure.PlaceInChunk(chunkPos, m_terrainTiles)
 	
-	var chunkNoise : float = GetChunkNoise(chunkPos)
-#	if chunkNoise > 0.3 and chunkNoise < 0.31:
-#		PlaceRocks(m_terrainTiles)
 	if chunkBaseType == Chunk.ChunkBaseType.STONY: 
 		PlaceRocks(m_terrainTiles)
 	
@@ -134,18 +104,6 @@ func PopulateChunkData(terrainTileData : Dictionary[Vector2i, Chunk.TerrainTileD
 				
 			decorationTiles[pos] = Chunk.DecorationTileData.MakeNew(stones.pick_random())
 
-func PlaceChunkAt(chunkPos : Vector2i, chunkData : Chunk):
-	var globalTileXPos = chunkPos.x * 32
-	var globlTileYPos = chunkPos.y * 32
-	for cell in chunkData.m_terrainTiles:
-		var data : Chunk.TerrainTileData = chunkData.m_terrainTiles[cell]
-		terrainTilesLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
-		
-	for cell in chunkData.m_decorationTiles:
-		var data : Chunk.DecorationTileData = chunkData.m_decorationTiles[cell]
-		decoratinTilesLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
-
-
 const ChunkBaseTypeFileNames : Dictionary[Chunk.ChunkBaseType, String] = {
 	Chunk.ChunkBaseType.RIVER_H1 : "riverH1",
 	Chunk.ChunkBaseType.RIVER_H2 : "riverH2",
@@ -174,6 +132,3 @@ func LoadBaseChunkTypeTerrain(baseType : Chunk.ChunkBaseType) -> Dictionary[Vect
 		terrain[tilePos] = Chunk.TerrainTileData.MakeNew(tile)
 	
 	return terrain
-
-func GetChunkNoise(chunkPos : Vector2i) -> float:
-	return m_noiseMap[chunkPos.x + 31][chunkPos.y + 31]

@@ -63,7 +63,24 @@ enum TileType {
 	WATER_GRASS_ISLAND_TOP_LEFT,
 	WATER_GRASS_ISLAND_TOP_RIGHT,
 	WATER_GRASS_ISLAND_BOTTOM_LEFT,
-	WATER_GRASS_ISLAND_BOTTOM_RIGHT
+	WATER_GRASS_ISLAND_BOTTOM_RIGHT,
+	
+	# stone
+	STONE
+}
+
+enum DecorationTileTypes {
+	PETALS_1,
+	PETALS_2,
+	PETALS_3,
+	PETALS_4,
+	TALL_GRASS,
+	ROSE,
+	SNOWY_TALL_GRASS,
+	ROCK_1,
+	ROCK_2,
+	ROCK_3,
+	ROCK_4,
 }
 
 const TileSrcID : String = "srcId"
@@ -127,5 +144,20 @@ const TileTypeData : Dictionary = {
 	TileType.WATER_GRASS_ISLAND_TOP_LEFT : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 3) },
 	TileType.WATER_GRASS_ISLAND_TOP_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 3) },
 	TileType.WATER_GRASS_ISLAND_BOTTOM_LEFT : {TileSrcID : 3, TileAttlassCoords : Vector2i(4, 4) },
-	TileType.WATER_GRASS_ISLAND_BOTTOM_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 4) }
+	TileType.WATER_GRASS_ISLAND_BOTTOM_RIGHT : {TileSrcID : 3, TileAttlassCoords : Vector2i(5, 4) },
+	TileType.STONE : {TileSrcID : 3, TileAttlassCoords : Vector2i(7, 0) }
+}
+
+const DecorationTileTypeData : Dictionary = {
+	DecorationTileTypes.PETALS_1 : {TileSrcID : 0, TileAttlassCoords : Vector2i(0, 0) },
+	DecorationTileTypes.PETALS_2 : {TileSrcID : 0, TileAttlassCoords : Vector2i(1, 0) },
+	DecorationTileTypes.PETALS_3 : {TileSrcID : 0, TileAttlassCoords : Vector2i(2, 0) },
+	DecorationTileTypes.PETALS_4 : {TileSrcID : 0, TileAttlassCoords : Vector2i(3, 0) },
+	DecorationTileTypes.TALL_GRASS : {TileSrcID : 0, TileAttlassCoords : Vector2i(0, 1) },
+	DecorationTileTypes.ROSE : {TileSrcID : 0, TileAttlassCoords : Vector2i(3, 1) },
+	DecorationTileTypes.SNOWY_TALL_GRASS : {TileSrcID : 0, TileAttlassCoords : Vector2i(0, 4) },
+	DecorationTileTypes.ROCK_1 : {TileSrcID : 0, TileAttlassCoords : Vector2i(0, 3) },
+	DecorationTileTypes.ROCK_2 : {TileSrcID : 0, TileAttlassCoords : Vector2i(1, 3) },
+	DecorationTileTypes.ROCK_3 : {TileSrcID : 0, TileAttlassCoords : Vector2i(2, 3) },
+	DecorationTileTypes.ROCK_4 : {TileSrcID : 0, TileAttlassCoords : Vector2i(3, 3) }
 }
