@@ -3,18 +3,31 @@ extends Node
 
 signal ChunkGenerated(chunkPos : Vector2i, chunk : Chunk)
 
-@onready var worldName : String
+@onready var m_worldData : WorldData = null
+@onready var file : String
 
-var m_worldData : WorldData = null
 func _ready() -> void:
-	m_worldData = load("res://" + worldName + ".tres") as WorldData
+	print(file)
+	m_worldData = load(file) as WorldData
 	assert(m_worldData != null)
 
-# TODO this will be async multithreaded someday (soon i hope lol)
 func GenerateChunks(positions : Array[Vector2i]):
+	WorkerThreadPool.add_group_task(
+		func(i):
+			var pos = positions[i]
+			var chunk = GenerateChunk(pos)
+			
+			call_deferred("OnChunkGenerated", pos, chunk),
+			positions.size()
+	)
+	"""
 	for pos in positions:
 		var chunk : Chunk = GenerateChunk(pos)
 		ChunkGenerated.emit(pos, chunk)
+	"""
+
+func OnChunkGenerated(pos, chunk):
+	ChunkGenerated.emit(pos, chunk)
 
 func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 	var chunkBaseType : Chunk.ChunkBaseType = m_worldData.chunkTypeMap[chunkPos]
@@ -49,11 +62,12 @@ func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 	return chunk
 
 func PlaceRocks(tileData : Dictionary[Vector2i, Chunk.TerrainTileData]):
+	var rng : RandomNumberGenerator = RandomNumberGenerator.new()
 	var rockFill = func(pos : Vector2i):
 		var stack : Array = []
-		var visited : Array = []
+		var visited : Dictionary[Vector2i, bool] = {}
 		
-		var initLifeTime : int = randi_range(5, 10)
+		var initLifeTime : int = rng.randi_range(5, 10)
 		stack.append([pos, initLifeTime])
 		
 		while not stack.is_empty():
@@ -70,20 +84,21 @@ func PlaceRocks(tileData : Dictionary[Vector2i, Chunk.TerrainTileData]):
 				for j in [-1, 0, 1]:
 					var neighbour : Vector2i = Vector2i(position.x + i, position.y + j)
 					if (neighbour in tileData) and (not neighbour in visited):
-						stack.append([neighbour, currLifeTime - randi_range(1, 2)])
+						stack.append([neighbour, currLifeTime - rng.randi_range(1, 2)])
 			
-			visited.append(position)
+			visited[position] = true
 	
-	for i in range(randi_range(3, 8)):
-		var randPos : Vector2i = Vector2i(randi_range(0, 31), randi_range(0, 31))
+	for i in range(rng.randi_range(3, 8)):
+		var randPos : Vector2i = Vector2i(rng.randi_range(0, 31), rng.randi_range(0, 31))
 		
 		if tileData[randPos].m_type == Global.TileType.GRASS:
 			rockFill.call(randPos)
 
 func PopulateChunkData(terrainTileData : Dictionary[Vector2i, Chunk.TerrainTileData], decorationTiles : Dictionary[Vector2i, Chunk.DecorationTileData]):
+	var rng : RandomNumberGenerator = RandomNumberGenerator.new()
 	for pos in terrainTileData:
 		if terrainTileData[pos].m_type == Global.TileType.GRASS:
-			var decision : int = randi_range(0, 100)
+			var decision : int = rng.randi_range(0, 100)
 			
 			if decision < 80:
 				continue
@@ -98,7 +113,7 @@ func PopulateChunkData(terrainTileData : Dictionary[Vector2i, Chunk.TerrainTileD
 		elif terrainTileData[pos].m_type == Global.TileType.STONE:
 			var stones : Array[Global.DecorationTileTypes] = [Global.DecorationTileTypes.ROCK_1, Global.DecorationTileTypes.ROCK_2, Global.DecorationTileTypes.ROCK_3, Global.DecorationTileTypes.ROCK_4]
 			
-			var decision : int = randi_range(0, 100)
+			var decision : int = rng.randi_range(0, 100)
 			if decision < 80:
 				continue
 				
@@ -115,7 +130,12 @@ const ChunkBaseTypeFileNames : Dictionary[Chunk.ChunkBaseType, String] = {
 	Chunk.ChunkBaseType.RIVER_CONNECTOR : "riverConnector",
 } 
 
+var cash : Dictionary = {}
+
 func LoadBaseChunkTypeTerrain(baseType : Chunk.ChunkBaseType) -> Dictionary[Vector2i, Chunk.TerrainTileData]:
+	if baseType in cash:
+		return cash[baseType]
+	
 	var path : String = "res://Data/Chunks/BaseTypeTerrainTiles/"
 	var filePath = path + ChunkBaseTypeFileNames[baseType] + ".dat"
 	var file = FileAccess.open(filePath, FileAccess.READ)
@@ -131,4 +151,5 @@ func LoadBaseChunkTypeTerrain(baseType : Chunk.ChunkBaseType) -> Dictionary[Vect
 		
 		terrain[tilePos] = Chunk.TerrainTileData.MakeNew(tile)
 	
+	cash[baseType] = terrain
 	return terrain

@@ -8,8 +8,6 @@ const RENDER_DISTANCE : int = 3
 
 var chunkGenerator : ChunkGenerator
 
-const save : bool = false
-
 var playerChunkPos : Vector2i = Vector2i(-1, -1)
 
 const fileName : String = "warudo"
@@ -18,11 +16,22 @@ const worldSize : int = 64
 var m_loadedChunk : Dictionary[Vector2i, Chunk] = {}
 
 func _ready() -> void:
-	if not FileAccess.file_exists("res://" + fileName + ".tres"):
-		GenerateWorld(worldSize)
+	var worldSaveDirectory : String = Global.SaveDirectory + fileName
+	
+	if not DirAccess.dir_exists_absolute(worldSaveDirectory):
+		DirAccess.make_dir_absolute(worldSaveDirectory)
+		DirAccess.make_dir_absolute(worldSaveDirectory + "/Chunks")
+	
+	var worldData : WorldData
+	if not FileAccess.file_exists(worldSaveDirectory + "/" + fileName + ".tres"):
+		worldData = GenerateWorld(worldSize)
+		ResourceSaver.save(worldData, worldSaveDirectory + "/" + fileName + ".tres")
+	else:
+		worldData = load(worldSaveDirectory + "/" + fileName + ".tres") as WorldData
 	
 	chunkGenerator = preload("res://Scenes/Chunk/ChunkGenerator/ChunkGenerator.tscn").instantiate()
-	chunkGenerator.worldName = fileName
+	chunkGenerator.file = worldSaveDirectory + "/" + fileName + ".tres"
+	chunkGenerator.m_worldData = worldData
 	chunkGenerator.ChunkGenerated.connect(ChunkGeneratedHandler)
 	add_child(chunkGenerator)
 
@@ -36,7 +45,7 @@ func GenerateWorld(worldSize : int):
 	worldData.chunkTypeMap = worldGenerator.GetChunkBaseMap()
 	worldData.structures = worldGenerator.GetStructures()
 	
-	ResourceSaver.save(worldData, "res://" + fileName + ".tres")
+	return worldData
 
 func ChunkGeneratedHandler(chunkPos : Vector2i, chunk : Chunk):
 	PlaceChunk(chunkPos, chunk)
@@ -80,6 +89,18 @@ func UpdateLoadedChunks():
 		UnloadChunk(chunkPos)
 		m_loadedChunk.erase(chunkPos)
 	
+	"""
+	var worldChunksDirectory : String = Global.SaveDirectory + fileName + "/Chunks"
+	var tmp : Array = chunksToload.duplicate()
+	for chunkPos in chunksToload:
+		var chunkFileName : String = str(chunkPos) + ".tres"
+		if FileAccess.file_exists(worldChunksDirectory + "/" + chunkFileName):
+			var chunk : Chunk = Chunk.FromFile(worldChunksDirectory + "/" + chunkFileName)
+			PlaceChunk(chunkPos, chunk)
+			m_loadedChunk[chunkPos] = chunk
+			tmp.erase(chunkPos)
+	"""
+	
 	chunkGenerator.GenerateChunks(chunksToload)
 
 func PlaceChunk(chunkPos : Vector2i, chunk : Chunk):
@@ -95,6 +116,10 @@ func PlaceChunk(chunkPos : Vector2i, chunk : Chunk):
 
 
 func UnloadChunk(chunkPos : Vector2i):
+	var worldChunksDirectory : String = Global.SaveDirectory + fileName + "/Chunks"
+	var chunkName : String = str(chunkPos) + ".tres"
+	var chunkPath : String = worldChunksDirectory + "/" + chunkName
+	
 	var globalTileXPos = chunkPos.x * 32
 	var globalTileYPos = chunkPos.y * 32
 	for i in range(32):
@@ -102,3 +127,5 @@ func UnloadChunk(chunkPos : Vector2i):
 			var tilePos : Vector2i = Vector2i(globalTileXPos + i, globalTileYPos + j)
 			terrainTileLayer.erase_cell(tilePos)
 			decorationTileLayer.erase_cell(tilePos)
+	
+	m_loadedChunk[chunkPos].SaveToFile(chunkPath)

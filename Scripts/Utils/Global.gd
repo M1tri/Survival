@@ -161,3 +161,5 @@ const DecorationTileTypeData : Dictionary = {
 	DecorationTileTypes.ROCK_3 : {TileSrcID : 0, TileAttlassCoords : Vector2i(2, 3) },
 	DecorationTileTypes.ROCK_4 : {TileSrcID : 0, TileAttlassCoords : Vector2i(3, 3) }
 }
+
+const SaveDirectory : StringName = "res://saves/"

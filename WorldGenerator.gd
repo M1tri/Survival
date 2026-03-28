@@ -39,16 +39,6 @@ func GenerateChunkBaseTypes():
 	@warning_ignore("integer_division")
 	m_cliff1Height = m_snowStartY/2
 	GenerateCliff()
-	
-	var worldData : WorldData = WorldData.new()
-	var name : String = "svet"
-	worldData.worldName = name
-	worldData.chunkTypeMap = m_chunkBaseMap 
-	worldData.structures = m_structures
-	
-	ResourceSaver.save(worldData, "res://" + name + ".tres")
-	
-	var worldData2 = load("res://" + name + ".tres")
 
 func GenerateRivers():
 	@warning_ignore("integer_division")
