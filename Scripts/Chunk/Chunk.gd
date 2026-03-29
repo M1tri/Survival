@@ -55,11 +55,11 @@ enum ChunkBaseType {
 }
 
 var m_baseType : ChunkBaseType
-var m_terrainTiles : Dictionary[Vector2i, TerrainTileData]
-var m_decorationTiles : Dictionary[Vector2i, DecorationTileData]
+var m_terrainTiles : Dictionary[Vector2i, Global.TileType]
+var m_decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes]
 var m_entityTiles : Dictionary[Vector2i, EntityTileData]
 
-func _init(baseType, terrainTiles, decorationTiles, entityTiles) -> void:
+func _init(baseType, terrainTiles: Dictionary[Vector2i, Global.TileType], decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes], entityTiles) -> void:
 	m_baseType = baseType
 	m_terrainTiles = terrainTiles
 	m_decorationTiles = decorationTiles
@@ -68,13 +68,13 @@ func _init(baseType, terrainTiles, decorationTiles, entityTiles) -> void:
 static func FromFile(resourcePath : String) -> Chunk:
 	var resource : ChunkSaveResource = load(resourcePath) as ChunkSaveResource 
 	
-	var terrainTiles : Dictionary[Vector2i, TerrainTileData] = {}
+	var terrainTiles : Dictionary[Vector2i, Global.TileType] = {}
 	for tileType in resource.tileData:
-		terrainTiles[tileType] = TerrainTileData.MakeNew(resource.tileData[tileType])
+		terrainTiles[tileType] = resource.tileData[tileType]
 	
-	var decorationTiles : Dictionary[Vector2i, DecorationTileData] = {}
+	var decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes] = {}
 	for tileType in resource.decorationData:
-		decorationTiles[tileType] = DecorationTileData.MakeNew(resource.decorationData[tileType])
+		decorationTiles[tileType] = resource.decorationData[tileType]
 	
 	return Chunk.new(resource.baseType, terrainTiles, decorationTiles, {})
 
@@ -84,12 +84,9 @@ func SaveToFile(resourcePath : String):
 	resource.baseType = m_baseType
 	
 	for tile in m_terrainTiles:
-		resource.tileData[tile] = m_terrainTiles[tile].m_type
+		resource.tileData[tile] = m_terrainTiles[tile]
 	
 	for tile in m_decorationTiles:
-		resource.decorationData[tile] = m_decorationTiles[tile].m_type
+		resource.decorationData[tile] = m_decorationTiles[tile]
 	
 	ResourceSaver.save(resource, resourcePath)
-
-func GetTileAt(pos : Vector2i) -> TerrainTileData:
-	return m_terrainTiles[pos]

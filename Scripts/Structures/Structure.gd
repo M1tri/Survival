@@ -9,4 +9,4 @@ extends Resource
 func IsInChunk(chunkPos : Vector2i) -> bool
 
 @abstract
-func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Chunk.TerrainTileData])
+func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Global.TileType])

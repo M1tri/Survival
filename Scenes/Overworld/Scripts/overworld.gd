@@ -32,6 +32,7 @@ func _ready() -> void:
 	chunkGenerator = preload("res://Scenes/Chunk/ChunkGenerator/ChunkGenerator.tscn").instantiate()
 	chunkGenerator.file = worldSaveDirectory + "/" + fileName + ".tres"
 	chunkGenerator.m_worldData = worldData
+	chunkGenerator.chunkFilesFolder = worldSaveDirectory + "/Chunks"
 	chunkGenerator.ChunkGenerated.connect(ChunkGeneratedHandler)
 	add_child(chunkGenerator)
 
@@ -107,12 +108,16 @@ func PlaceChunk(chunkPos : Vector2i, chunk : Chunk):
 	var globalTileXPos = chunkPos.x * 32
 	var globlTileYPos = chunkPos.y * 32
 	for cell in chunk.m_terrainTiles:
-		var data : Chunk.TerrainTileData = chunk.m_terrainTiles[cell]
-		terrainTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
+		var data : Global.TileType = chunk.m_terrainTiles[cell]
+		var srcId : int = Global.TileTypeData[data][Global.TileSrcID]
+		var attlasCoords : Vector2i = Global.TileTypeData[data][Global.TileAttlassCoords]
+		terrainTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), srcId, attlasCoords)
 		
 	for cell in chunk.m_decorationTiles:
-		var data : Chunk.DecorationTileData = chunk.m_decorationTiles[cell]
-		decorationTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), data.m_srcId, data.m_attlassCoords)
+		var data : Global.DecorationTileTypes = chunk.m_decorationTiles[cell]
+		var srcId : int = Global.DecorationTileTypeData[data][Global.TileSrcID]
+		var attlasCoords : Vector2i = Global.DecorationTileTypeData[data][Global.TileAttlassCoords]
+		decorationTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), srcId, attlasCoords)
 
 
 func UnloadChunk(chunkPos : Vector2i):

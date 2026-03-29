@@ -7,16 +7,14 @@ func IsInChunk(chunkPos : Vector2i) -> bool:
 			return true
 	return false
 
-func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Chunk.TerrainTileData]):
-	var snow : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snow.m_srcId = 3
-	snow.m_attlassCoords = Vector2i(9, 0)
+func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Global.TileType]):
+	var snow : Global.TileType = Global.TileType.SNOW
 	
 	for chunkLocal in chunkData:
 		var tileGlobal : Vector2i = CoordinateConverter.ChunkLocalToTileGlobal(chunkLocal, chunkPos)
 		
 		if m_tileData.has(tileGlobal):
-			chunkData[chunkLocal] = Chunk.TerrainTileData.MakeNew(m_tileData[tileGlobal])
+			chunkData[chunkLocal] = m_tileData[tileGlobal]
 			var verticalColumn : Vector2i = Vector2i(chunkLocal.x, chunkLocal.y-1)
 			if m_tileData[tileGlobal] == Global.TileType.SNOW_PATH_DOWN2\
 			 or m_tileData[tileGlobal] == Global.TileType.SNOW_PATH_UP1:
