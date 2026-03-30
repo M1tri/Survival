@@ -4,7 +4,7 @@ extends Node
 @onready var terrainTileLayer = $TerrainTileLayer
 @onready var decorationTileLayer = $DecorationTileLayer
 
-const RENDER_DISTANCE : int = 3
+const RENDER_DISTANCE : int = 2
 
 var chunkGenerator : ChunkGenerator
 
@@ -14,6 +14,11 @@ const fileName : String = "warudo"
 const worldSize : int = 64
 
 var m_loadedChunk : Dictionary[Vector2i, Chunk] = {}
+
+var chunk_queue : Array[Array] = []
+var interactableId : int = 0
+var interactables : Dictionary[int, Interactable]
+var interactablesPerChunk : Dictionary[Vector2i, Array] = {}
 
 func _ready() -> void:
 	var worldSaveDirectory : String = Global.SaveDirectory + fileName
@@ -49,8 +54,7 @@ func GenerateWorld(worldSize : int):
 	return worldData
 
 func ChunkGeneratedHandler(chunkPos : Vector2i, chunk : Chunk):
-	PlaceChunk(chunkPos, chunk)
-	m_loadedChunk[chunkPos] = chunk
+	chunk_queue.append([chunkPos, chunk])
 
 func _process(_delta: float) -> void:
 	var newPlayerChunkPos = Vector2i(player.global_position.x / 32, player.global_position.y / 32)
@@ -61,6 +65,11 @@ func _process(_delta: float) -> void:
 		print(playerChunkPos)
 		UpdateLoadedChunks()
 	
+	if not chunk_queue.is_empty():
+		var val = chunk_queue.pop_front()
+		PlaceChunk(val[0], val[1])
+		m_loadedChunk[val[0]] = val[1]
+
 func UpdateLoadedChunks():
 	
 	var chunksToKeepOrLoad : Array[Vector2i] = []
@@ -118,7 +127,19 @@ func PlaceChunk(chunkPos : Vector2i, chunk : Chunk):
 		var srcId : int = Global.DecorationTileTypeData[data][Global.TileSrcID]
 		var attlasCoords : Vector2i = Global.DecorationTileTypeData[data][Global.TileAttlassCoords]
 		decorationTileLayer.set_cell(Vector2i(cell.x + globalTileXPos, cell.y + globlTileYPos), srcId, attlasCoords)
-
+	
+	interactablesPerChunk[chunkPos] = []
+	for cell in chunk.m_interactables:
+		var instance = chunk.m_interactables[cell].GetInstance()
+		
+		var id = interactableId
+		interactableId += 1
+		interactables[id] = instance
+		interactablesPerChunk[chunkPos].append(id)
+		
+		var pos : Vector2 = CoordinateConverter.TileGlobalToGlobal(Vector2(globalTileXPos + cell.x, globlTileYPos+cell.y))
+		instance.position = pos
+		add_child(instance)
 
 func UnloadChunk(chunkPos : Vector2i):
 	var worldChunksDirectory : String = Global.SaveDirectory + fileName + "/Chunks"
@@ -132,5 +153,9 @@ func UnloadChunk(chunkPos : Vector2i):
 			var tilePos : Vector2i = Vector2i(globalTileXPos + i, globalTileYPos + j)
 			terrainTileLayer.erase_cell(tilePos)
 			decorationTileLayer.erase_cell(tilePos)
+	
+	for id in interactablesPerChunk[chunkPos]:
+		interactables[id].queue_free()
+		interactables.erase(id)
 	
 	m_loadedChunk[chunkPos].SaveToFile(chunkPath)

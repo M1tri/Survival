@@ -36,6 +36,7 @@ func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 	
 	var m_terrainTiles : Dictionary[Vector2i, Global.TileType]
 	var decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes]
+	var interactableData : Dictionary[Vector2i, InteractableData]
 	
 	if (chunkBaseType in [Chunk.ChunkBaseType.GRASS, Chunk.ChunkBaseType.SNOW, Chunk.ChunkBaseType.STONY]):
 		var tile : Global.TileType
@@ -56,9 +57,9 @@ func GenerateChunk(chunkPos : Vector2i) -> Chunk:
 	if chunkBaseType == Chunk.ChunkBaseType.STONY: 
 		PlaceRocks(m_terrainTiles)
 	
-	PopulateChunkData(m_terrainTiles, decorationTiles)
+	PopulateChunkData(m_terrainTiles, decorationTiles, interactableData)
 	
-	var chunk = Chunk.new(chunkBaseType, m_terrainTiles, decorationTiles, null)
+	var chunk = Chunk.new(chunkBaseType, m_terrainTiles, decorationTiles, interactableData)
 	
 	return chunk
 
@@ -95,13 +96,19 @@ func PlaceRocks(tileData : Dictionary[Vector2i, Global.TileType]):
 		if tileData[randPos] == Global.TileType.GRASS:
 			rockFill.call(randPos)
 
-func PopulateChunkData(terrainTileData : Dictionary[Vector2i, Global.TileType], decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes]):
+func PopulateChunkData(terrainTileData : Dictionary[Vector2i, Global.TileType], decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes], interactables : Dictionary[Vector2i, InteractableData]):
 	var rng : RandomNumberGenerator = RandomNumberGenerator.new()
 	for pos in terrainTileData:
-		if terrainTileData[pos] == Global.TileType.GRASS or terrainTileData[pos] == Global.TileType.SNOW:
+		if terrainTileData[pos] == Global.TileType.GRASS or terrainTileData[pos] == Global.TileType.SNOW and pos not in interactables:
 			var decision : int = rng.randi_range(0, 100)
 			
 			if decision < 80:
+				continue
+			
+			if decision < 85:
+				var bush : BushData = BushData.new()
+				bush.state = Bush.State.EMPTY
+				interactables[pos] = bush
 				continue
 			
 			if decision < 90:

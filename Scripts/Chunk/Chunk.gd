@@ -3,43 +3,6 @@ extends RefCounted
 
 const CHUNK_SIZE : int = 32
 
-class TerrainTileData:
-	var m_type : Global.TileType
-	var m_srcId : int
-	var m_attlassCoords : Vector2i
-	
-	static func MakeNew(type : Global.TileType) -> TerrainTileData:
-		var ret = TerrainTileData.new()
-		
-		ret.m_type = type
-		ret.m_srcId = Global.TileTypeData[type][Global.TileSrcID]
-		ret.m_attlassCoords = Global.TileTypeData[type][Global.TileAttlassCoords]
-		
-		return ret
-	
-	func IsEqual(type : Global.TileType):
-		return self.m_type == type
-
-class DecorationTileData:
-	var m_type : Global.DecorationTileTypes
-	var m_srcId : int
-	var m_attlassCoords : Vector2i
-	
-	static func MakeNew(type : Global.DecorationTileTypes) -> DecorationTileData:
-		var ret = DecorationTileData.new()
-		
-		ret.m_type = type
-		ret.m_srcId = Global.DecorationTileTypeData[type][Global.TileSrcID]
-		ret.m_attlassCoords = Global.DecorationTileTypeData[type][Global.TileAttlassCoords]
-		
-		return ret
-	
-	func IsEqual(type : Global.TileType):
-		return self.m_type == type
-
-class EntityTileData:
-	pass
-
 enum ChunkBaseType {
 	GRASS,
 	RIVER_H1,
@@ -57,13 +20,13 @@ enum ChunkBaseType {
 var m_baseType : ChunkBaseType
 var m_terrainTiles : Dictionary[Vector2i, Global.TileType]
 var m_decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes]
-var m_entityTiles : Dictionary[Vector2i, EntityTileData]
+var m_interactables : Dictionary[Vector2i, InteractableData]
 
-func _init(baseType, terrainTiles: Dictionary[Vector2i, Global.TileType], decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes], entityTiles) -> void:
+func _init(baseType, terrainTiles: Dictionary[Vector2i, Global.TileType], decorationTiles : Dictionary[Vector2i, Global.DecorationTileTypes], interactables : Dictionary[Vector2i, InteractableData]) -> void:
 	m_baseType = baseType
 	m_terrainTiles = terrainTiles
 	m_decorationTiles = decorationTiles
-	#m_entityTiles = entityTiles
+	m_interactables = interactables
 
 static func FromFile(resourcePath : String) -> Chunk:
 	var resource : ChunkSaveResource = load(resourcePath) as ChunkSaveResource 

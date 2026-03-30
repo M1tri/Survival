@@ -8,10 +8,6 @@ func IsInChunk(chunkPos : Vector2i) -> bool:
 	return false
 
 func PlaceInChunk(chunkPos : Vector2i, chunkData : Dictionary[Vector2i, Global.TileType]):
-	var snow : Chunk.TerrainTileData = Chunk.TerrainTileData.new()
-	snow.m_srcId = 3
-	snow.m_attlassCoords = Vector2i(9, 0)
-	
 	for chunkLocal in chunkData:
 		var tileGlobal : Vector2i = CoordinateConverter.ChunkLocalToTileGlobal(chunkLocal, chunkPos)
 		

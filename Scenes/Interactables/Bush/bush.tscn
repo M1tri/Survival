@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://fevrncqtf44y"]
+
+[ext_resource type="Script" uid="uid://bjayoxmydkk1a" path="res://Scripts/Interactables/Bush/Bush.gd" id="1_3hayl"]
+[ext_resource type="Texture2D" uid="uid://bf4fni68rhijq" path="res://Assets/Interactables/Bush/bush_empty.png" id="1_7yppu"]
+[ext_resource type="Texture2D" uid="uid://b2vrn8flrfcd0" path="res://Assets/Interactables/Bush/bush_grown.png" id="2_3hayl"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_am7pg"]
+atlas = ExtResource("1_7yppu")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_au5tq"]
+atlas = ExtResource("2_3hayl")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ispb0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_am7pg")
+}],
+"loop": true,
+"name": &"empty",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_au5tq")
+}],
+"loop": true,
+"name": &"grown",
+"speed": 5.0
+}]
+
+[node name="Bush" type="Node2D" unique_id=1927294071]
+script = ExtResource("1_3hayl")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2123898550]
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(16, 16)
+sprite_frames = SubResource("SpriteFrames_ispb0")
+animation = &"empty"
